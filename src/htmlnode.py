@@ -37,6 +37,9 @@ class LeafNode(HTMLNode):
         if self.props:
             for k,v in self.props.items():
                 props_string += f' {k}="{v}"'
+        
+        if self.tag == "img":
+            return f"<{self.tag}{props_string}>"
 
         return f"<{self.tag}{props_string}>{self.value}</{self.tag}>"
 
