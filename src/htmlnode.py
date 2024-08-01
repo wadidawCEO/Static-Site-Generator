@@ -9,7 +9,7 @@ class HTMLNode:
         raise NotImplementedError
 
     def props_to_html(self):
-        #return props in strings by iterating the whole props using dict.items()
+        # Return props in strings by iterating the whole props using dict.items()
         props_string = ""
         if self.props == None:
             return ""
@@ -18,7 +18,7 @@ class HTMLNode:
         return props_string
 
     def __repr__(self):
-        #print HTMLNode object
+        # Print HTMLNode object
         return f"tag = {self.tag}, value = {self.value}, children = {self.children}, props = {self.props}"
 
 class LeafNode(HTMLNode):
@@ -32,7 +32,7 @@ class LeafNode(HTMLNode):
             raise ValueError("Need Value")
         if self.tag == None:
             return self.value
-        #return props in strings by iterating the whole props using dict.items() if theres is self.props    
+        # Return props in strings by iterating the whole props using dict.items() if theres is self.props    
         props_string = ""
         if self.props:
             for k,v in self.props.items():
@@ -55,7 +55,7 @@ class ParentNode(HTMLNode):
         if not self.children:
             raise ValueError("Need Children Argument")
         result = ""
-        #iterate all self.children and running to_html method
+        # Iterate all self.children and running to_html method
         for child in self.children:
             result += child.to_html()
         return f"<{self.tag}>{result}</{self.tag}>"

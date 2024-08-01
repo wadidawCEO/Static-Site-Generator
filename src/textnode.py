@@ -36,5 +36,42 @@ def text_node_to_html_node(text_node):
         props = {"href": text_node.url}
 
     return LeafNode(tag, text, props)
+
+def split_nodes_delimiter(old_nodes, delimiter, text_type):
+# Could be improve to handle nested delimiter
+
+    accepted_text_type = ["italic", "bold", "code", "link", "image"]
+    new_nodes = []
+
+    for node in old_nodes:
+        if node.text_type == "text":
+            if delimiter in node.text:
+                text_splitted = node.text.split(delimiter)
+
+                for index, value in enumerate(text_splitted):
+                    if value: # Only append non-empty node
+                    
+                        if index % 2 == 0:
+                        # Even indices is always the non delimited text
+                            new_nodes.append(TextNode(value, "text", node.url))
+                        else:
+                        # Odd indices is always the delimited text
+                            new_nodes.append(TextNode(value, text_type, node.url))
+            else:
+                new_nodes.append(node)
+
+        elif node.text_type in accepted_text_type:
+            # Append node if it's one of the accepted types
+            new_nodes.append(node)
+
+        else:
+            raise Exception("Not the right node text type")
+
+    return new_nodes
+
+
+
+
+
         
 
