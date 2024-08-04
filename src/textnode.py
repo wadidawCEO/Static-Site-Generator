@@ -47,9 +47,12 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         if node.text_type == "text":
             if delimiter in node.text:
                 text_splitted = node.text.split(delimiter)
+                
+                if len(text_splitted) % 2 == 0:
+                    raise ValueError("Invalid markdown, formatted section not closed")
 
                 for index, value in enumerate(text_splitted):
-                    if value: # Only append non-empty node
+                    if value: # Only append non-empty text_splitted
                     
                         if index % 2 == 0:
                         # Even indices is always the non delimited text
@@ -57,6 +60,9 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                         else:
                         # Odd indices is always the delimited text
                             new_nodes.append(TextNode(value, text_type, node.url))
+
+                    else:
+                        continue
             else:
                 new_nodes.append(node)
 

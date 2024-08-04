@@ -125,5 +125,12 @@ class TestTextNode(unittest.TestCase):
         ]
         self.assertEqual(result, expected_output)
 
+    def test_split_nodes_delimiter_invalid_markdown(self):
+        with self.assertRaises(ValueError) as message:
+            node = [TextNode("This is text with a *uneven bolded phrase word", "text")]
+            result = split_nodes_delimiter(node, "*", "bold")
+        self.assertTrue("Invalid markdown, formatted section not closed" in str(message.exception))
+    
+
 if __name__ == "__main__":
     unittest.main()
