@@ -1,4 +1,7 @@
+import re
+
 from htmlnode import LeafNode
+from extract_markdown import extract_markdown_images, extract_markdown_links
 
 class TextNode:
     def __init__(self, text, text_type, url = None):
@@ -48,7 +51,7 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             if delimiter in node.text:
                 text_splitted = node.text.split(delimiter)
                 
-                if len(text_splitted) % 2 == 0:
+                if len(text_splitted) % 2 == 0: 
                     raise ValueError("Invalid markdown, formatted section not closed")
 
                 for index, value in enumerate(text_splitted):
@@ -74,6 +77,78 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             raise Exception("Not the right node text type")
 
     return new_nodes
+
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+
+        matches = extract_markdown_images(node.text)
+        if matches == []: # if no image just append as is
+            new_nodes.append(node)
+
+        else:
+            start = 0
+
+            for match in matches:
+                image_regex = f"![{match[0]}]({match[1]})"
+                find_index = node.text.find(image_regex, start) # find the index where the image starts
+
+                if start != find_index: # append text before image if any
+                    new_nodes.append(TextNode(node.text[start: find_index], "text"))
+                
+                # append image
+                new_nodes.append(TextNode(match[0], "image", match[1]))
+
+                # append text after image
+                start = find_index + len(image_regex)
+            
+            if start < len(node.text): # if there's still text after the for loop is done, append it
+                new_nodes.append(TextNode(node.text[start:], "text"))
+
+    # remove node that are empty            
+    new_nodes = [node for node in new_nodes if node.text]
+
+    return new_nodes
+            
+
+def split_nodes_link(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+
+        matches = extract_markdown_links(node.text)
+        if matches == []: # if no link just append as is
+            new_nodes.append(node)
+
+        else:
+            start = 0
+
+            for match in matches:
+                link_regex = f"[{match[0]}]({match[1]})"
+                find_index = node.text.find(link_regex, start) # find the index where the image starts
+
+                if start != find_index: # append text before image if any
+                    new_nodes.append(TextNode(node.text[start: find_index], "text"))
+                
+                # append image
+                new_nodes.append(TextNode(match[0], "link", match[1]))
+
+                # append text after image
+                start = find_index + len(link_regex)
+            
+            if start < len(node.text): # if there's still text after the for loop is done, append it
+                new_nodes.append(TextNode(node.text[start:], "text"))
+
+    # remove node that are empty            
+    new_nodes = [node for node in new_nodes if node.text]
+
+    return new_nodes
+
+def text_to_textnodes(text):
+    text_node = [TextNode(text, "text")]
+    delimiter_tuple = [("**", "bold"), ("*", "italic"), ("`", "code")]
+    for i in delimiter_tuple:
+        text_node = split_nodes_delimiter(text_node, i[0], i[1])
+    return split_nodes_image(split_nodes_link(text_node))
 
 
 
